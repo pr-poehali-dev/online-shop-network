@@ -1,4 +1,5 @@
 import { Page, Product } from '../App';
+import { User } from '@/lib/api';
 import Icon from '@/components/ui/icon';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +8,7 @@ import { Button } from '@/components/ui/button';
 interface HomePageProps {
   onNavigate: (page: Page) => void;
   onProductClick: (product: Product) => void;
+  currentUser: User;
 }
 
 const mockProducts: Product[] = [
@@ -66,7 +68,7 @@ const mockProducts: Product[] = [
   }
 ];
 
-export default function HomePage({ onNavigate, onProductClick }: HomePageProps) {
+export default function HomePage({ onNavigate, onProductClick, currentUser }: HomePageProps) {
   return (
     <div className="min-h-screen">
       <nav className="sticky top-0 z-50 bg-card/95 backdrop-blur-sm border-b border-border">

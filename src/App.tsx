@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,6 +10,8 @@ import ProfilePage from './pages/ProfilePage';
 import ProductPage from './pages/ProductPage';
 import AdminPage from './pages/AdminPage';
 import MyPurchasesPage from './pages/MyPurchasesPage';
+import AuthPage from './pages/AuthPage';
+import { getAuth, User } from './lib/api';
 
 export type Page = 'home' | 'catalog' | 'purchases' | 'chats' | 'profile' | 'product' | 'admin';
 
@@ -36,7 +38,14 @@ const queryClient = new QueryClient();
 const AppContent = () => {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const auth = getAuth();
+    if (auth) {
+      setUser(auth.user);
+    }
+  }, []);
 
   const navigateToProduct = (product: Product) => {
     setSelectedProduct(product);
@@ -49,12 +58,19 @@ const AppContent = () => {
 
   const handleAdminLogin = (username: string, password: string) => {
     if (username === 'skzry' && password === '568876Qqq') {
-      setIsAdmin(true);
       setCurrentPage('admin');
       return true;
     }
     return false;
   };
+
+  const handleAuthSuccess = (authUser: User) => {
+    setUser(authUser);
+  };
+
+  if (!user) {
+    return <AuthPage onAuthSuccess={handleAuthSuccess} />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -62,6 +78,7 @@ const AppContent = () => {
         <HomePage 
           onNavigate={navigateToPage} 
           onProductClick={navigateToProduct}
+          currentUser={user}
         />
       )}
       {currentPage === 'catalog' && (
@@ -80,6 +97,8 @@ const AppContent = () => {
         <ProfilePage 
           onNavigate={navigateToPage}
           onAdminLogin={handleAdminLogin}
+          currentUser={user}
+          onLogout={() => setUser(null)}
         />
       )}
       {currentPage === 'product' && selectedProduct && (
@@ -89,7 +108,7 @@ const AppContent = () => {
           onBack={() => setCurrentPage('home')}
         />
       )}
-      {currentPage === 'admin' && isAdmin && (
+      {currentPage === 'admin' && user.isAdmin && (
         <AdminPage onNavigate={navigateToPage} />
       )}
     </div>

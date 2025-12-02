@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Page } from '../App';
+import { User, logout } from '@/lib/api';
 import Icon from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,9 +13,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 interface ProfilePageProps {
   onNavigate: (page: Page) => void;
   onAdminLogin: (username: string, password: string) => boolean;
+  currentUser: User;
+  onLogout: () => void;
 }
 
-export default function ProfilePage({ onNavigate, onAdminLogin }: ProfilePageProps) {
+export default function ProfilePage({ onNavigate, onAdminLogin, currentUser, onLogout }: ProfilePageProps) {
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [adminUsername, setAdminUsername] = useState('');
@@ -92,16 +95,28 @@ export default function ProfilePage({ onNavigate, onAdminLogin }: ProfilePagePro
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Card className="border-border/50 bg-card/50 mb-6">
           <CardContent className="pt-6">
-            <div className="flex items-center gap-4 mb-6">
-              <Avatar className="w-20 h-20 border-4 border-primary">
-                <AvatarFallback className="gradient-gaming text-white text-2xl font-bold">
-                  У
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h2 className="text-2xl font-bold">Пользователь</h2>
-                <p className="text-muted-foreground">user@gamemarket.com</p>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <Avatar className="w-20 h-20 border-4 border-primary">
+                  <AvatarFallback className="gradient-gaming text-white text-2xl font-bold">
+                    {currentUser.username[0].toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h2 className="text-2xl font-bold">{currentUser.username}</h2>
+                  <p className="text-muted-foreground">{currentUser.email}</p>
+                </div>
               </div>
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  logout();
+                  onLogout();
+                }}
+              >
+                <Icon name="LogOut" size={18} className="mr-2" />
+                Выйти
+              </Button>
             </div>
 
             <div className="grid md:grid-cols-3 gap-4">
